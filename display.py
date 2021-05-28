@@ -25,16 +25,21 @@ def lookup(picked, date_token, meal_time):
         print(meal[0]) # 메뉴 표시
         print("\n")
 
-    print("({}). 뒤로 가기".format(c+1))
-    ret = input("원하시는 메뉴를 선택해주세요! : ")
+    print("({}). 뒤로 가기".format(c+2))
+    print("\n")
+    ret = int(input("원하시는 메뉴를 선택해주세요! : "))
+    print(ret,type(ret))
 
-    if(ret == c+1): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
+    if(ret == c+2): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
+        print("이전 화면으로 돌아갑니다.")
+        cls()
         return 0 
-
-    ##############은서은스ㅓ은서은서은서은서은서은서 은서가 볼곳######3########
-    else: # 선택된 메뉴를 가지고 여기서 으쌰으쌰
-        print("선택 메뉴: ", menu[c]) # menu[c]가 선택 메뉴라서 여기서 더 이어서 하면 댐. 리턴을 시켜서 하는게 더 나아 보이긴함
-        return menu[c]
+    else:
+        print("그래 이제부터 내가 할 곳 !")
+    # ##############은서은스ㅓ은서은서은서은서은서은서 은서가 볼곳######3########
+    # else: # 선택된 메뉴를 가지고 여기서 으쌰으쌰
+    #     print("선택 메뉴: ", menu[ret]) # menu[c]가 선택 메뉴라서 여기서 더 이어서 하면 댐. 리턴을 시켜서 하는게 더 나아 보이긴함
+    #     return menu[c]
         
 
 # main
@@ -42,7 +47,8 @@ def main():
     while(1):
         try:
             now = datetime.now()
-            dt_string = now.strftime("%m/%d %H:%M")
+            # dt_string = now.strftime("%m/%d %H:%M")
+            dt_string = "05/28 12:30"
             date_token = dt_string.split(" ")
             meal_time = ""
 
