@@ -4,6 +4,8 @@ import time
 import os,sys
 import time
 
+def cart(tmp_cart):
+    pass
 # 이 함수는 clear 명령어 같은 것 !
 def cls():
     os.system('cls' if os.name=='nt' else 'clear' )
@@ -35,7 +37,9 @@ def lookup(menu):
         print("({}). 장바구니 보러가기 ".format(c+3))
         print("\n")
 
-        ret = int(input("원하시는 메뉴들을 담아주세요 : "))
+        print("담긴 개수 | ",len(tmp_cart))
+
+        ret = int(input("원하는 메뉴들을 담아주세요 : "))
         print(ret,type(ret))
 
         if(ret == c+2): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
@@ -47,14 +51,24 @@ def lookup(menu):
             # cart(tmp_cart)
             pass
         else:
-            print("장바구니에 정상적으로 담겼습니다")
-            time.sleep(0.5)
-    # ##############은서은스ㅓ은서은서은서은서은서은서 은서가 볼곳######3########
-    # else: # 선택된 메뉴를 가지고 여기서 으쌰으쌰
-    #     print("선택 메뉴: ", menu[ret]) # menu[c]가 선택 메뉴라서 여기서 더 이어서 하면 댐. 리턴을 시켜서 하는게 더 나아 보이긴함
-    #     return menu[c]
-        
-    
+            # 개수조절 또는 담은 메뉴 삭제는 장바구니 화면에서만 할 수 있음
+            # if문으로 분기 
+            try:
+                if menu[ret-1] in tmp_cart:
+                    print("이미 담은 메뉴입니다.")
+                else:
+                    tmp_cart.append(menu[ret-1])
+                    print("장바구니에 정상적으로 담겼습니다.")
+                    print("장바구니 목록:",tmp_cart)
+                    time.sleep(0.5)
+            except IndexError:
+                tmp_cart.append(menu[ret-1])
+                print("장바구니에 정상적으로 담겼습니다.")
+                time.sleep(0.5)
+                print("장바구니 목록:",tmp_cart)
+
+
+
 
 # main
 def main():
