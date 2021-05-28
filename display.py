@@ -4,6 +4,36 @@ import time
 import os,sys
 import time
 
+def pay_list(order):
+    # for order in order:
+    # total=
+    # discount=
+    # pay=
+    print("=======================[주문 내역]========================")
+    # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고 // 담은수량
+    # 회원인지 비회원인지는 이미 등록되어 온 상태라고 가정한다.
+    # 총금액, 회원할인금액, 결제 금액까지 보여주고 / 결제하러가기 클릭 
+    # 우리은행 
+    for order in order:
+        print("{} | 가격:{} | 수량:{}".format(order[0][0],order[0][1],order[1]))
+        print("-------------------------------------------------------------")
+    print("\n\n")
+    print("=======================[결제 내역]========================")
+    print(총금액)
+
+    print("({}). 뒤로 가기".format(1))
+    print("\n")
+    print("({}). 결제 하러 가기 (QR코드) ".format(2))
+
+    go=int(input())
+    if(go == 1): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
+        print("이전 화면으로 돌아갑니다.")
+        cls()
+        return 0 
+    else:
+        # grcode()
+        pass
+
 def cart(tmp_cart):
     print("=====[장바구니]====")
     order=[]
@@ -19,12 +49,12 @@ def cart(tmp_cart):
         print("({}). 뒤로 가기".format(c+2))
         print("\n")
 
-        print("({}). 결제 하러 가기 ".format(c+3))
+        print("({}). 주문 내역 보러 가기 ".format(c+3))
         print("\n")
 
         print("담긴 개수 | ",len(tmp_cart))
 
-        ret = int(input("어떤 메뉴의 개수를 조절하시겠습니까? : "))
+        ret = int(input("개수를 조절하고픈 메뉴를 선택해주세요 : "))
         while(ret<=0 or ret>c+3):
             ret = int(input("다시 입력해주세요 : "))
         
@@ -35,7 +65,7 @@ def cart(tmp_cart):
             return 0 
         elif(ret == c+3):
             time.sleep(1)
-            # order_list(what) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
+            pay_list(order) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
             cls()
             pass
         else:
