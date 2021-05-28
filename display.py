@@ -5,7 +5,41 @@ import os,sys
 import time
 
 def cart(tmp_cart):
-    pass
+    print("=====[장바구니]====")
+    order=[]
+    # print("장바구니 목록 보여주기",tmp_cart)
+    while(1):
+        c = 0
+        for idx, meal in enumerate(tmp_cart):
+            c = idx
+            order.append([meal,1])
+            print("({}). {}".format(idx+1, meal[1])) # 가격 표시
+            print(meal[0]) # 메뉴 표시
+            print("\n")
+        print(order)
+        print("({}). 뒤로 가기".format(c+2))
+        print("\n")
+
+        print("({}). 결제 하러 가기 ".format(c+3))
+        print("\n")
+
+        print("담긴 개수 | ",len(tmp_cart))
+
+        ret = int(input("어떤 메뉴의 개수를 조절하시겠습니까? : "))
+        while(ret<=0 or ret>c+3):
+            ret = int(input("다시 입력해주세요 : "))
+        
+
+        if(ret == c+2): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
+            print("이전 화면으로 돌아갑니다.")
+            cls()
+            return 0 
+        else:
+            print("아직 못했서요,,, 미안><")
+            # -> 특정 메뉴 클릭, 개수 입력 / 단 0,10 사이로만 가능함
+            # 반환값은 order list
+
+
 # 이 함수는 clear 명령어 같은 것 !
 def cls():
     os.system('cls' if os.name=='nt' else 'clear' )
@@ -22,6 +56,7 @@ def today_menu(picked,date_token,meal_time): #오늘(지금) 구매 가능한 �
 # 메뉴 디스플레이하고 선택하는 함수
 def lookup(menu):
     cls()
+    print("=====[메뉴 선택]====")
     tmp_cart=[] # 장바구니 화면에서 이어서 보여져야할 구매목록들
     while(1):
         c = 0
@@ -40,7 +75,8 @@ def lookup(menu):
         print("담긴 개수 | ",len(tmp_cart))
 
         ret = int(input("원하는 메뉴들을 담아주세요 : "))
-        print(ret,type(ret))
+        while(ret<=0 or ret>c+3):
+            ret = int(input("다시 입력해주세요 : "))
 
         if(ret == c+2): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
             print("이전 화면으로 돌아갑니다.")
@@ -48,24 +84,24 @@ def lookup(menu):
             return 0 
 
         elif(ret == c+3): # 장바구니 보러가기 기능
-            # cart(tmp_cart)
-            pass
+            cart(tmp_cart)
         else:
             # 개수조절 또는 담은 메뉴 삭제는 장바구니 화면에서만 할 수 있음
-            # if문으로 분기 
+            # 따라서 if문으로 분기 
             try:
                 if menu[ret-1] in tmp_cart:
                     print("이미 담은 메뉴입니다.")
+                    time.sleep(1)
                 else:
                     tmp_cart.append(menu[ret-1])
                     print("장바구니에 정상적으로 담겼습니다.")
-                    print("장바구니 목록:",tmp_cart)
-                    time.sleep(0.5)
+                    # print("장바구니 목록:",tmp_cart)
+                    time.sleep(1)
             except IndexError:
                 tmp_cart.append(menu[ret-1])
                 print("장바구니에 정상적으로 담겼습니다.")
-                time.sleep(0.5)
-                print("장바구니 목록:",tmp_cart)
+                time.sleep(1)
+                # print("장바구니 목록:",tmp_cart)
 
 
 
