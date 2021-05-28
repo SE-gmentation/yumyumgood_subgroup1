@@ -16,7 +16,6 @@ def cart(tmp_cart):
             print("({}). {}".format(idx+1, meal[1])) # 가격 표시
             print(meal[0]) # 메뉴 표시
             print("\n")
-        print(order)
         print("({}). 뒤로 가기".format(c+2))
         print("\n")
 
@@ -34,8 +33,16 @@ def cart(tmp_cart):
             print("이전 화면으로 돌아갑니다.")
             cls()
             return 0 
+        elif(ret == c+3):
+            time.sleep(1)
+            # order_list(what) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
+            cls()
+            pass
         else:
-            print("아직 못했서요,,, 미안><")
+            num = int(input("원하는 만큼 개수 조절을 해주세요 : "))
+            if(num<0 or num>10): # 개수 조절 범위 : 0~10
+                num = int(input("개수 조절 허용 범위는 0~10입니다.다시 입력해주세요"))
+            order[ret-1][1]=num
             # -> 특정 메뉴 클릭, 개수 입력 / 단 0,10 사이로만 가능함
             # 반환값은 order list
 
@@ -84,6 +91,7 @@ def lookup(menu):
             return 0 
 
         elif(ret == c+3): # 장바구니 보러가기 기능
+            time.sleep(1)
             cart(tmp_cart)
         else:
             # 개수조절 또는 담은 메뉴 삭제는 장바구니 화면에서만 할 수 있음
