@@ -4,34 +4,48 @@ import time
 import os,sys
 import time
 
-def pay_list(order):
-    # for order in order:
-    # total=
-    # discount=
-    # pay=
-    print("=======================[주문 내역]========================")
-    # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고 // 담은수량
+def pay_list(orders):
+    total=0
+
+    for order in orders:
+        cost=int(order[0][1][0]+order[0][1][2:-1])
+        total+=cost*order[1]
+
+    discount=total//10 # 일단 회원할인 전체 금액의 10프로 할인이라고 가정
+    pay=total-discount
+
+    print("=======================[주문 내역]===========================")
     # 회원인지 비회원인지는 이미 등록되어 온 상태라고 가정한다.
     # 총금액, 회원할인금액, 결제 금액까지 보여주고 / 결제하러가기 클릭 
-    # 우리은행 
-    for order in order:
-        print("{} | 가격:{} | 수량:{}".format(order[0][0],order[0][1],order[1]))
+    total_num =0
+    for order in orders:
+        if(order[1]==0): continue
+        print(" 가격:{}원 | 수량:{}개 | {}".format(cost,order[1],order[0][0]))
+        total_num=total_num+order[1]
         print("-------------------------------------------------------------")
+    print(" 총수량 | {}".format(total_num))
+    print("-------------------------------------------------------------")
     print("\n\n")
-    print("=======================[결제 내역]========================")
-    print(총금액)
 
+
+    print("=========================[결제 내역]=========================")
+    print("총금액    |                                     {}".format(total))
+    print("회원 할인 ㅣ                                    {}".format(discount))
+    print("결제 금액 |                                     {}".format(pay))
+    print("-------------------------------------------------------------")
+    
+    print("\n\n")
     print("({}). 뒤로 가기".format(1))
     print("\n")
-    print("({}). 결제 하러 가기 (QR코드) ".format(2))
+    print("({}). 결제 하러 가기 (QR코드) \n".format(2))
 
-    go=int(input())
+    go=int(input("결제를 원하시면 2번을 선택해주세요. :"))
     if(go == 1): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
         print("이전 화면으로 돌아갑니다.")
         cls()
         return 0 
     else:
-        # grcode()
+        # qrcode()
         pass
 
 def cart(tmp_cart):
@@ -46,13 +60,12 @@ def cart(tmp_cart):
             print("({}). {}".format(idx+1, meal[1])) # 가격 표시
             print(meal[0]) # 메뉴 표시
             print("\n")
+
         print("({}). 뒤로 가기".format(c+2))
         print("\n")
 
         print("({}). 주문 내역 보러 가기 ".format(c+3))
         print("\n")
-
-        print("담긴 개수 | ",len(tmp_cart))
 
         ret = int(input("개수를 조절하고픈 메뉴를 선택해주세요 : "))
         while(ret<=0 or ret>c+3):
@@ -65,8 +78,8 @@ def cart(tmp_cart):
             return 0 
         elif(ret == c+3):
             time.sleep(1)
-            pay_list(order) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
             cls()
+            pay_list(order) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
             pass
         else:
             num = int(input("원하는 만큼 개수 조절을 해주세요 : "))
