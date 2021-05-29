@@ -1,4 +1,4 @@
-# import qrcode as qr
+import qrcode 
 import parse_data as pd
 from datetime import *
 import time
@@ -6,11 +6,36 @@ import os,sys
 import time
 
 
-def create_qrcode():
-    # QR=qrcode.make("주문 접수가 완료되었습니다.")
-    # # QR이미지를 저장하시겠습니까?
-    # QR.save(("qr_instance.png"))
-    pass
+def create_qrcode(orders):
+    # 현재 시간 가져오기
+    current = datetime.now()
+    # 10분 후 시간 가져오기
+    ten_minutes_later = current + timedelta(minutes=10)
+    ten_minutes_later = ten_minutes_later.strftime('%H시 %M분')
+    
+    print("\n            [. . . . . . loading . . . . . .]\n")
+    time.sleep(1)
+    QR=qrcode.make(orders) # 주문 내역에 대한 정보 qr코드에 저장
+
+    print("======================================================================")
+    print("                      QR이 정상적으로 생성되었습니다.")
+    print("{}까지 {}학식당에 가서 큐알코드를 보여주세요 (유효시간:10분)".format(ten_minutes_later,"은서>_<")) # 아직 학식당 안불러옴 나중에 디비에서 빼장
+    print("======================================================================\n")
+    
+    # stock_update() # 디비 재고 업데이트 하는 부분! 
+
+    num=int(input("QR이미지를 저장하시겠습니까? (1) yes (2) no : "))
+
+    if num==1:
+        QR.save(("qr_image.png"))
+
+    print("\n주문이 성공적으로 접수되었습니다!!")
+    print("첫 화면으로 돌아갑니다.")
+    time.sleep(2)
+
+    cls()
+    main()
+    
 
 
 def stock_update():
@@ -60,7 +85,7 @@ def pay_list(orders):
         cls()
         return 0 
     else:
-        create_qrcode()
+        create_qrcode(orders)
         pass
 
 def cart(tmp_cart):
