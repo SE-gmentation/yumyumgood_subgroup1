@@ -1,10 +1,19 @@
 import qrcode 
-import parse_data as pd
+#import parse_data as pd
 from datetime import *
 import time
 import os,sys
 import time
 
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+date_token=[]
+load_dotenv(verbose=True)
+client = MongoClient(os.getenv('MONGO_URL'))
+
+db = client.meal
+globalDB = db.cham
 
 def create_qrcode(orders):
     # 현재 시간 가져오기
@@ -36,11 +45,12 @@ def create_qrcode(orders):
     cls()
     main()
     
-
-
-def stock_update():
-    #qrcode 생성과 동시에 db접근하여 재고 수량 업데이트하기
-    pass
+# qrcode 생성과 동시에 db접근하여 재고 수량 업데이트
+def stock_update(orders):
+    for order in orders:
+        temp = order[0]
+        temp[2] -= order[1]
+        globalDB.update_one({"date":date_token[0]}, {"$set":{temp[3]:temp}},  upsert=True)
 
 def pay_list(orders):
     total=0
@@ -85,6 +95,7 @@ def pay_list(orders):
         cls()
         return 0 
     else:
+        stock_update(orders)
         create_qrcode(orders)
         pass
 
@@ -130,23 +141,25 @@ def cart(tmp_cart):
             pass
         else:
             num = int(input("원하는 만큼 개수 조절을 해주세요 : "))
-            if(num<0 or num>10): # 개수 조절 범위 : 0~10
-                num = int(input("개수 조절 허용 범위는 0~10입니다.다시 입력해주세요"))
+            while((num<0 or num>10) or num > meal[2] ):
+                if(num<0 or num>10): # 개수 조절 범위 : 0~10
+                    num = int(input("개수 조절 허용 범위는 0~10입니다.다시 입력해주세요 : "))
+                elif(num > meal[2]): # 재고 수량보다 넘겼을 경우
+                    num = int(input("재고({})보다 많은 수량을 주문할 수 없습니다. 다시 입력해주세요: ".format(meal[2])))
             order[ret-1][1]=num
             # -> 특정 메뉴 클릭, 개수 입력 / 단 0,10 사이로만 가능함
-            # 반환값은 order list
 
 
 # 이 함수는 clear 명령어 같은 것 !
 def cls():
     os.system('cls' if os.name=='nt' else 'clear' )
 
-def today_menu(picked,date_token,meal_time): #오늘(지금) 구매 가능한 메뉴 리스트 정보 담는 함수 따로 분기
+def today_menu(picked,meal_time): #오늘(지금) 구매 가능한 메뉴 리스트 정보 담는 함수 따로 분기
     menu = []
-    # 오늘 날짜의 메뉴에서 / 중, 석식 가려내기
-    for time in picked[date_token[0]]:    
+    for time in picked:    
         if(meal_time in time or "간식" in time):
-            meal = picked[date_token[0]][time] # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고
+            meal = picked[time] # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고, meal[3] = 카테고리
+            meal.append(time)
             menu.append(meal)
     return menu
 
@@ -159,7 +172,7 @@ def lookup(menu):
         c = 0
         for idx, meal in enumerate(menu):
             c = idx
-            print("({}). {}".format(idx+1, meal[1])) # 가격 표시
+            print("({}). {} / 재고 : {}".format(idx+1, meal[1], meal[2])) # 가격 표시
             print(meal[0]) # 메뉴 표시
             print("\n")
 
@@ -206,9 +219,10 @@ def lookup(menu):
 
 
 
-
 # main
 def main():
+    global date_token
+    global globalDB
     while(1):
         try:
             now = datetime.now()
@@ -216,10 +230,6 @@ def main():
             dt_string = "05/28 12:30"
             date_token = dt_string.split(" ")
             meal_time = ""
-
-            # 데이터 파싱
-            cham = pd.cham_res()
-            blue = pd.blue_res()
 
             hour = int(date_token[1].split(":")[0])
 
@@ -236,13 +246,17 @@ def main():
             print("2. 블루미르홀 308관")
             print("3. 종료하기\n")
             res = input("조회를 원하는 식당이나 옵션을 선택해주세요. : ")
-            picked = {}
+
             if(res =="1" or res == "2"):
                 if(res =="1"):
-                    picked = cham
+                    picked = list(globalDB.find({"date":date_token[0]}))
+                    picked = picked[0]
                 elif(res == "2"):
-                    picked = blue
-                menu=today_menu(picked,date_token,meal_time)
+                    globalDB = db.blue
+                    picked = list(globalDB.find({"date":date_token[0]}))
+                    picked = picked[0]
+
+                menu=today_menu(picked,meal_time)
                 lookup(menu)
             elif(res == "3"):
                 print("\n프로그램을 종료합니다 ! 빠이빠이")
