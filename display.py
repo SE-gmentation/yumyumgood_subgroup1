@@ -3,6 +3,13 @@ from datetime import *
 import time
 import os,sys
 import time
+def qrcode():
+    return True
+
+
+def stock_update():
+    #qrcode가 true면 db접근하여 재고 가감하기
+    pass
 
 def pay_list(orders):
     total=0
