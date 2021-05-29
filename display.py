@@ -5,7 +5,6 @@ import os,sys
 import time
 
 def pay_list(orders):
-    print(orders)
     total=0
 
     for order in orders:
@@ -53,6 +52,7 @@ def cart(tmp_cart):
     print("=====[장바구니]====")
     order=[]
     
+    # 주문목록(장바구니에 담긴 메뉴, 수량) 담기
     for meal in tmp_cart:
         order.append([meal,1])
 
@@ -64,7 +64,7 @@ def cart(tmp_cart):
             print("({}). {}".format(idx+1, meal[1])) # 가격 표시
             print(meal[0]) # 메뉴 표시
             print("\n")
-        print(order)
+
         print("({}). 뒤로 가기".format(c+2))
         print("\n")
 
@@ -138,8 +138,11 @@ def lookup(menu):
             return 0 
 
         elif(ret == c+3): # 장바구니 보러가기 기능
-            time.sleep(0.5)
-            cart(tmp_cart)
+            if len(tmp_cart)==0:
+                print("메뉴를 1개 이상 담아주세요.")
+                time.sleep(0.5)
+            else:
+                cart(tmp_cart)
         else:
             # 개수조절 또는 담은 메뉴 삭제는 장바구니 화면에서만 할 수 있음
             # 따라서 if문으로 분기 
