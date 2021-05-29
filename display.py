@@ -1,14 +1,20 @@
+import qrcode as qr
 import parse_data as pd
 from datetime import *
 import time
 import os,sys
 import time
-def qrcode():
+
+
+def create_qrcode():
+    QR=qrcode.make("주문 접수가 완료되었습니다.")
+    # QR이미지를 저장하시겠습니까?
+    QR.save(("qr_instance.png"))
     return True
 
 
 def stock_update():
-    #qrcode가 true면 db접근하여 재고 가감하기
+    #qrcode 생성과 동시에 db접근하여 재고 수량 업데이트하기
     pass
 
 def pay_list(orders):
@@ -43,7 +49,7 @@ def pay_list(orders):
     print("결제 금액 |                                     {}원".format(pay))
     print("=============================================================")
     
-    print("\n\n")
+    print("\n")
     print("({}). 뒤로 가기".format(1))
     print("\n")
     print("({}). 결제 하러 가기 (QR코드) \n".format(2))
@@ -54,7 +60,7 @@ def pay_list(orders):
         cls()
         return 0 
     else:
-        # qrcode()
+        create_qrcode()
         pass
 
 def cart(tmp_cart):
@@ -68,7 +74,7 @@ def cart(tmp_cart):
     # print("장바구니 목록 보여주기",tmp_cart)
     while(1):
         cls()
-        print("=====[장바구니]====")
+        print("=========[장바구니]=========")
         c = 0
         for idx, meal in enumerate(tmp_cart):
             c = idx
@@ -124,7 +130,7 @@ def lookup(menu):
     tmp_cart=[] # 장바구니 화면에서 이어서 보여져야할 구매목록들
     while(1):
         cls()
-        print("=====[메뉴 선택]====")
+        print("=========[메뉴 선택]========")
         c = 0
         for idx, meal in enumerate(menu):
             c = idx
