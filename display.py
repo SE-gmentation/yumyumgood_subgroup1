@@ -1,4 +1,4 @@
-import qrcode as qr
+# import qrcode as qr
 import parse_data as pd
 from datetime import *
 import time
@@ -7,10 +7,10 @@ import time
 
 
 def create_qrcode():
-    QR=qrcode.make("주문 접수가 완료되었습니다.")
-    # QR이미지를 저장하시겠습니까?
-    QR.save(("qr_instance.png"))
-    return True
+    # QR=qrcode.make("주문 접수가 완료되었습니다.")
+    # # QR이미지를 저장하시겠습니까?
+    # QR.save(("qr_instance.png"))
+    pass
 
 
 def stock_update():
