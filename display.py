@@ -5,6 +5,7 @@ import os,sys
 import time
 
 def pay_list(orders):
+    print(orders)
     total=0
 
     for order in orders:
@@ -51,16 +52,19 @@ def pay_list(orders):
 def cart(tmp_cart):
     print("=====[장바구니]====")
     order=[]
+    
+    for meal in tmp_cart:
+        order.append([meal,1])
+
     # print("장바구니 목록 보여주기",tmp_cart)
     while(1):
         c = 0
         for idx, meal in enumerate(tmp_cart):
             c = idx
-            order.append([meal,1])
             print("({}). {}".format(idx+1, meal[1])) # 가격 표시
             print(meal[0]) # 메뉴 표시
             print("\n")
-
+        print(order)
         print("({}). 뒤로 가기".format(c+2))
         print("\n")
 
@@ -77,7 +81,7 @@ def cart(tmp_cart):
             cls()
             return 0 
         elif(ret == c+3):
-            time.sleep(1)
+            time.sleep(0.5)
             cls()
             pay_list(order) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
             pass
@@ -134,7 +138,7 @@ def lookup(menu):
             return 0 
 
         elif(ret == c+3): # 장바구니 보러가기 기능
-            time.sleep(1)
+            time.sleep(0.5)
             cart(tmp_cart)
         else:
             # 개수조절 또는 담은 메뉴 삭제는 장바구니 화면에서만 할 수 있음
@@ -142,16 +146,16 @@ def lookup(menu):
             try:
                 if menu[ret-1] in tmp_cart:
                     print("이미 담은 메뉴입니다.")
-                    time.sleep(1)
+                    time.sleep(0.5)
                 else:
                     tmp_cart.append(menu[ret-1])
                     print("장바구니에 정상적으로 담겼습니다.")
                     # print("장바구니 목록:",tmp_cart)
-                    time.sleep(1)
+                    time.sleep(0.5)
             except IndexError:
                 tmp_cart.append(menu[ret-1])
                 print("장바구니에 정상적으로 담겼습니다.")
-                time.sleep(1)
+                time.sleep(0.5)
                 # print("장바구니 목록:",tmp_cart)
 
 
