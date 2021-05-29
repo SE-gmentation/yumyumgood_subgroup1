@@ -6,33 +6,35 @@ import time
 
 def pay_list(orders):
     total=0
-
+    costs=[]
     for order in orders:
         cost=int(order[0][1][0]+order[0][1][2:-1])
+        costs.append(cost)
         total+=cost*order[1]
 
     discount=total//10 # 일단 회원할인 전체 금액의 10프로 할인이라고 가정
     pay=total-discount
 
-    print("=======================[주문 내역]===========================")
+    print("=========================[주문 내역]=========================")
     # 회원인지 비회원인지는 이미 등록되어 온 상태라고 가정한다.
     # 총금액, 회원할인금액, 결제 금액까지 보여주고 / 결제하러가기 클릭 
     total_num =0
-    for order in orders:
+    for i, order in enumerate(orders):
         if(order[1]==0): continue
-        print(" 가격:{}원 | 수량:{}개 | {}".format(cost,order[1],order[0][0]))
+        print("{}".format(order[0][0]))
+        print("                                     수량:{}개 | 가격:{}원 |".format(order[1],costs[i]*order[1]))
         total_num=total_num+order[1]
         print("-------------------------------------------------------------")
     print(" 총수량 | {}".format(total_num))
-    print("-------------------------------------------------------------")
+    print("=============================================================")
     print("\n\n")
 
 
     print("=========================[결제 내역]=========================")
-    print("총금액    |                                     {}".format(total))
-    print("회원 할인 ㅣ                                    {}".format(discount))
-    print("결제 금액 |                                     {}".format(pay))
-    print("-------------------------------------------------------------")
+    print("총금액    |                                     {}원".format(total))
+    print("회원 할인 ㅣ                                    {}원".format(discount))
+    print("결제 금액 |                                     {}원".format(pay))
+    print("=============================================================")
     
     print("\n\n")
     print("({}). 뒤로 가기".format(1))
@@ -49,7 +51,7 @@ def pay_list(orders):
         pass
 
 def cart(tmp_cart):
-    print("=====[장바구니]====")
+    
     order=[]
     
     # 주문목록(장바구니에 담긴 메뉴, 수량) 담기
@@ -58,10 +60,12 @@ def cart(tmp_cart):
 
     # print("장바구니 목록 보여주기",tmp_cart)
     while(1):
+        cls()
+        print("=====[장바구니]====")
         c = 0
         for idx, meal in enumerate(tmp_cart):
             c = idx
-            print("({}). {}".format(idx+1, meal[1])) # 가격 표시
+            print("({}). {} [담은 개수 : {}]".format(idx+1, meal[1],order[idx][1])) # 가격 표시
             print(meal[0]) # 메뉴 표시
             print("\n")
 
@@ -80,6 +84,7 @@ def cart(tmp_cart):
             print("이전 화면으로 돌아갑니다.")
             cls()
             return 0 
+
         elif(ret == c+3):
             time.sleep(0.5)
             cls()
@@ -109,10 +114,10 @@ def today_menu(picked,date_token,meal_time): #오늘(지금) 구매 가능한 �
 
 # 메뉴 디스플레이하고 선택하는 함수
 def lookup(menu):
-    cls()
-    print("=====[메뉴 선택]====")
     tmp_cart=[] # 장바구니 화면에서 이어서 보여져야할 구매목록들
     while(1):
+        cls()
+        print("=====[메뉴 선택]====")
         c = 0
         for idx, meal in enumerate(menu):
             c = idx
