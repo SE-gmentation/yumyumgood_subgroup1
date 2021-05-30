@@ -99,55 +99,32 @@ def pay_list(orders):
         stock_update(orders)
         create_qrcode(orders)
 
-def cart(tmp_cart):
+class Order: # 얘는 uc4의 메뉴리스트 아니고, uc2의 주문(메뉴리스트+담은수량)
+    def __init__(self):
+        self.order=[]
     
-    order=[]
+    def append_order(self,order_list):
+        self.order.append(order_list)
+
+    def control_menu_num(self,order_idx,control_num): # 개수 조절
+        self.order[order_idx][1]=control_num
     
+    def get_order(self):
+        return self.order
+
+def UC2_controller(tmp_cart):
+    order = Order()
+        
     # 주문목록(장바구니에 담긴 메뉴, 수량) 담기
     for meal in tmp_cart:
-        order.append([meal,1])
+        order.append_order([meal,1])
 
-    # print("장바구니 목록 보여주기",tmp_cart)
     while(1):
-        cls()
-        print("=========[장바구니]=========")
-        c = 0
-        for idx, meal in enumerate(tmp_cart):
-            c = idx
-            print("({}). {} [담은 개수 : {}]".format(idx+1, meal[1],order[idx][1])) # 가격 표시
-            print(meal[0]) # 메뉴 표시
-            print("\n")
-
-        print("({}). 뒤로 가기".format(c+2))
-        print("\n")
-
-        print("({}). 주문 내역 보러 가기 ".format(c+3))
-        print("\n")
-
-        ret = int(input("개수를 조절하고픈 메뉴를 선택해주세요 : "))
-        while(ret<=0 or ret>c+3):
-            ret = int(input("다시 입력해주세요 : "))
+        interface=PM_Interface()
+        c = interface.UC2_interface(tmp_cart,order.get_order())
         
-
-        if(ret == c+2): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
-            print("이전 화면으로 돌아갑니다.")
-            cls()
-            return 0 
-
-        elif(ret == c+3):
-            time.sleep(0.5)
-            cls()
-            pay_list(order) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
-            pass
-        else:
-            num = int(input("원하는 만큼 개수 조절을 해주세요 : "))
-            while((num<0 or num>10) or num > meal[2] ):
-                if(num<0 or num>10): # 개수 조절 범위 : 0~10
-                    num = int(input("개수 조절 허용 범위는 0~10입니다.다시 입력해주세요 : "))
-                elif(num > meal[2]): # 재고 수량보다 넘겼을 경우
-                    num = int(input("재고({})보다 많은 수량을 주문할 수 없습니다. 다시 입력해주세요: ".format(meal[2])))
-            order[ret-1][1]=num
-            # -> 특정 메뉴 클릭, 개수 입력 / 단 0,10 사이로만 가능함
+        button = Button_click()
+        button.control_menu_num(c,order)
 
 
 # 이 함수는 clear 명령어 같은 것 !
@@ -164,11 +141,26 @@ class Menu:
                 menu.append(meal)
         return menu
 
-class UC4_Interface:
-    def __init__(self):
-        pass
+class PM_Interface:
+    def UC2_interface(self,tmp_cart,order):
+        cls()
+        print("=========[장바구니]=========")
+        c = 0
+        for idx, meal in enumerate(tmp_cart):
+            c = idx
+            print("({}). {} [담은 개수 : {}]".format(idx+1, meal[1],order[idx][1])) # 가격 표시
+            print(meal[0]) # 메뉴 표시
+            print("\n")
 
-    def interface(self):
+        print("({}). 뒤로 가기".format(c+2))
+        print("\n")
+
+        print("({}). 주문 내역 보러 가기 ".format(c+3))
+        print("\n")
+
+        return c
+
+    def UC4_interface(self):
         global date_token
         global restaurant
         global globalDB
@@ -195,7 +187,7 @@ class UC4_Interface:
 
         return meal_time
 
-class UC4_button_click:
+class Button_click:
     def available_now(self,meal_time):
         global date_token
         global restaurant
@@ -227,6 +219,7 @@ class UC4_button_click:
         except KeyboardInterrupt:
             print("\n프로그램을 종료합니다 ! 빠이빠이")
             sys.exit()
+        cls()
 
     # 메뉴 디스플레이하고 선택하는 함수
     def putMenu(self,menu):
@@ -263,9 +256,36 @@ class UC4_button_click:
                     print("메뉴를 1개 이상 담아주세요.")
                     time.sleep(0.5)
                 else:
-                    cart(tmp_cart.get_tmp_cart())
+                    print("?")
+                    UC2_controller(tmp_cart.get_tmp_cart())
             else:
                 tmp_cart.compute_total_num(menu[ret-1])
+
+    def control_menu_num(self,c,order):
+        ret = int(input("개수를 조절하고픈 메뉴를 선택해주세요 : "))
+        while(ret<=0 or ret>c+3):
+            ret = int(input("다시 입력해주세요 : "))
+        
+        if(ret == c+2): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
+            print("이전 화면으로 돌아갑니다.")
+            cls()
+            return 0 
+
+        elif(ret == c+3):
+            time.sleep(0.5)
+            cls()
+            pay_list(order.get_order()) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
+            pass
+        else:
+            num = int(input("원하는 만큼 개수 조절을 해주세요 : "))
+            # while((num<0 or num>10) or num > meal[2] ):
+            while((num<0 or num>10)):
+                if(num<0 or num>10): # 개수 조절 범위 : 0~10
+                    num = int(input("개수 조절 허용 범위는 0~10입니다.다시 입력해주세요 : "))
+                # elif(num > meal[2]): # 재고 수량보다 넘겼을 경우
+                #     num = int(input("재고({})보다 많은 수량을 주문할 수 없습니다. 다시 입력해주세요: ".format(meal[2])))
+            order.control_menu_num(ret-1,num)
+            # -> 특정 메뉴 클릭, 개수 입력 / 단 0,10 사이로만 가능함
 
 class Tmp_cart:
     def __init__(self):
@@ -291,17 +311,16 @@ class Tmp_cart:
         return self.tmp_cart
 
 def UC4_controller():
-    interface = UC4_Interface()
-    meal_time=interface.interface()
+    interface = PM_Interface()
+    meal_time=interface.UC4_interface()
 
-    button = UC4_button_click()
+    button = Button_click()
     button.available_now(meal_time)
+
+
         
 
 if __name__ == "__main__":
     UC4_controller()
-
-
-
     # UC2_controller()
     # UC5_controller()
