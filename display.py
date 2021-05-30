@@ -44,7 +44,8 @@ class QRcode:
         time.sleep(2)
 
         cls()
-        UC4_controller()
+        controller = Controller()
+        controller.UC4_controller()
     
 
 
@@ -67,17 +68,7 @@ class Calculator:
     def calculate_pay(self,discount):
         return self.total-discount
 
-def UC5_controller(orders):
-    calculator = Calculator(orders)
-    costs,total = calculator.calculate_amount()
-    discount = calculator.calculate_discount()
-    pay=calculator.calculate_pay(discount)
 
-    interface=PM_Interface()
-    interface.UC5_interface(costs,total,discount,pay,orders)
-
-    button = Button_click()
-    button.payment_process(orders)
 
     
 
@@ -94,19 +85,7 @@ class Order: # 얘는 uc4의 메뉴리스트 아니고, uc2의 주문(메뉴리�
     def get_order(self):
         return self.order
 
-def UC2_controller(tmp_cart):
-    order = Order()
-        
-    # 주문목록(장바구니에 담긴 메뉴, 수량) 담기
-    for meal in tmp_cart:
-        order.append_order([meal,1])
 
-    while(1):
-        interface=PM_Interface()
-        c = interface.UC2_interface(tmp_cart,order.get_order())
-        
-        button = Button_click()
-        button.control_menu_num(c,order)
 
 
 # 이 함수는 clear 명령어 같은 것 !
@@ -275,7 +254,8 @@ class Button_click:
                     print("메뉴를 1개 이상 담아주세요.")
                     time.sleep(0.5)
                 else:
-                    UC2_controller(tmp_cart.get_tmp_cart())
+                    controller = Controller()
+                    controller.UC2_controller(tmp_cart.get_tmp_cart())
             else:
                 tmp_cart.compute_total_num(menu[ret-1])
 
@@ -292,7 +272,8 @@ class Button_click:
         elif(ret == c+3):
             time.sleep(0.5)
             cls()
-            UC5_controller(order.get_order())
+            controller = Controller()
+            controller.UC5_controller(order.get_order())
             # pay_list(order.get_order()) # 결제 하러 가기 (주문 내역 및 결제버튼 확인하는 화면으로 이동)
             pass
         else:
@@ -350,17 +331,43 @@ class Tmp_cart:
     def get_tmp_cart(self):
         return self.tmp_cart
 
-def UC4_controller():
-    interface = PM_Interface()
-    meal_time=interface.UC4_interface()
+class Controller:
+    def UC4_controller(self):
+        interface = PM_Interface()
+        meal_time=interface.UC4_interface()
 
-    button = Button_click()
-    button.available_now(meal_time)
+        button = Button_click()
+        button.available_now(meal_time)
+    
+    def UC2_controller(self,tmp_cart):
+        order = Order()
+        
+        # 주문목록(장바구니에 담긴 메뉴, 수량) 담기
+        for meal in tmp_cart:
+            order.append_order([meal,1])
+
+        while(1):
+            interface=PM_Interface()
+            c = interface.UC2_interface(tmp_cart,order.get_order())
+            
+            button = Button_click()
+            button.control_menu_num(c,order)
+    
+    def UC5_controller(self,orders):
+        calculator = Calculator(orders)
+        costs,total = calculator.calculate_amount()
+        discount = calculator.calculate_discount()
+        pay=calculator.calculate_pay(discount)
+
+        interface=PM_Interface()
+        interface.UC5_interface(costs,total,discount,pay,orders)
+
+        button = Button_click()
+        button.payment_process(orders)
 
 
         
 
 if __name__ == "__main__":
-    UC4_controller()
-    # UC2_controller()
-    # UC5_controller()
+    controller = Controller()
+    controller.UC4_controller()
