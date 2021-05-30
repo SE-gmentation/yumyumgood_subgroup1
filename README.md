@@ -98,7 +98,7 @@
   ![image](https://user-images.githubusercontent.com/63635886/120102498-4ad23280-c186-11eb-93b4-169b4b45c04f.png)
   - QR코드 생성 및 이미지 저장
   ![image](https://user-images.githubusercontent.com/65647080/120113274-ac10fa80-c1b4-11eb-817a-84673e9cebad.png)
-  <img src="https://user-images.githubusercontent.com/65647080/120113321-e11d4d00-c1b4-11eb-873c-5758927b8423.png" width="200">
+    <img src="https://user-images.githubusercontent.com/65647080/120113321-e11d4d00-c1b4-11eb-873c-5758927b8423.png" width="200">
   
   - 디비 반영 결과 (재고 | 10 ▶ 6, 10 ▶ 9)
   ![image](https://user-images.githubusercontent.com/65647080/120113184-47ee3680-c1b4-11eb-917b-a42a6f759121.png)
