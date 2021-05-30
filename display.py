@@ -349,7 +349,7 @@ class QRcode:
 
         print("\n주문이 성공적으로 접수되었습니다!!")
         print("첫 화면으로 돌아갑니다.")
-        time.sleep(2)
+        time.sleep(3)
 
         cls()
         controller = Controller()
