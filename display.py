@@ -16,100 +16,43 @@ restaurant =""
 db = client.meal
 globalDB = db.cham
 
-class QRcode:
-    def create_qrcode(self,orders):
-        global restaurant
-        # 현재 시간 가져오기
-        current = datetime.now()
-        # 10분 후 시간 가져오기
-        ten_minutes_later = current + timedelta(minutes=10)
-        ten_minutes_later = ten_minutes_later.strftime('%H시 %M분')
-        
-        print("\n            [. . . . . . loading . . . . . .]\n")
-        time.sleep(1)
-        QR=qrcode.make(orders) # 주문 내역에 대한 정보 qr코드에 저장
-
-        print("======================================================================")
-        print("                      QR이 정상적으로 생성되었습니다.")
-        print("{}까지 {} 학식당에 가서 큐알코드를 보여주세요 (유효시간:10분)".format(ten_minutes_later,restaurant)) # 아직 학식당 안불러옴 나중에 디비에서 빼장
-        print("======================================================================\n")
-        
-        num=int(input("QR이미지를 저장하시겠습니까? (1) yes (2) no : "))
-
-        if num==1:
-            QR.save(("qr_image.png"))
-
-        print("\n주문이 성공적으로 접수되었습니다!!")
-        print("첫 화면으로 돌아갑니다.")
-        time.sleep(2)
-
-        cls()
-        controller = Controller()
-        controller.UC4_controller()
-    
-
-
-class Calculator:
-    def __init__(self,orders):
-        self.total=0
-        self.costs=[]
-        self.orders=orders
-    
-    def calculate_amount(self):
-        for order in self.orders:
-            cost=int(order[0][1][0]+order[0][1][2:-1])
-            self.costs.append(cost)
-            self.total+=cost*order[1]
-        return self.costs,self.total
-
-    def calculate_discount(self):
-        return self.total//10
-
-    def calculate_pay(self,discount):
-        return self.total-discount
-
-
-
-    
-
-class Order: # 얘는 uc4의 메뉴리스트 아니고, uc2의 주문(메뉴리스트+담은수량)
-    def __init__(self):
-        self.order=[]
-    
-    def append_order(self,order_list):
-        self.order.append(order_list)
-
-    def control_menu_num(self,order_idx,control_num): # 개수 조절
-        self.order[order_idx][1]=control_num
-    
-    def get_order(self):
-        return self.order
-
-
-
-
-# 이 함수는 clear 명령어 같은 것 !
+# clear()
 def cls():
     os.system('cls' if os.name=='nt' else 'clear' )
 
-class Menu:
-    def __init__(self):
-        self.menu=[]
+class Controller:
+    def UC4_controller(self):
+        interface = PM_Interface()
+        meal_time=interface.UC4_interface()
 
-    def today_menu(self,picked,meal_time): #오늘(지금) 구매 가능한 메뉴 리스트 정보 담는 함수 따로 분기
-        for time in picked:    
-            if(meal_time in time or "간식" in time):
-                meal = picked[time] # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고, meal[3] = 카테고리
-                meal.append(time)
-                self.menu.append(meal)
-        return self.menu
+        button = Button_click()
+        button.available_now(meal_time)
+    
+    def UC2_controller(self,tmp_cart):
+        order = Order()
+        
+        # 주문목록(장바구니에 담긴 메뉴, 수량) 담기
+        for meal in tmp_cart:
+            order.append_order([meal,1])
 
-    # qrcode 생성과 동시에 db접근하여 재고 수량 업데이트
-    def stock_update(self,orders):
-        for order in orders:
-            temp = order[0]
-            temp[2] -= order[1]
-            globalDB.update_one({"date":date_token[0]}, {"$set":{temp[3]:temp}},  upsert=True)
+        while(1):
+            interface=PM_Interface()
+            c = interface.UC2_interface(tmp_cart,order.get_order())
+            
+            button = Button_click()
+            button.control_menu_num(c,order)
+    
+    def UC5_controller(self,orders):
+        calculator = Calculator(orders)
+        costs,total = calculator.calculate_amount()
+        discount = calculator.calculate_discount()
+        pay=calculator.calculate_pay(discount)
+
+        interface=PM_Interface()
+        interface.UC5_interface(costs,total,discount,pay,orders)
+
+        button = Button_click()
+        button.payment_process(orders)
 
 class PM_Interface:
     def UC2_interface(self,tmp_cart,order):
@@ -183,7 +126,6 @@ class PM_Interface:
         print("({}). 뒤로 가기".format(1))
         print("\n")
         print("({}). 결제 하러 가기 (QR코드) \n".format(2))
-
 
 class Button_click:
     def available_now(self,meal_time):
@@ -298,15 +240,24 @@ class Button_click:
             qr = QRcode()
             qr.create_qrcode(orders)
 
-class Data_filter:
-    def filtering(self,num,order,ret):
-        max_stock = order.get_order()[ret-1][0][2]
-        while((num<0 or num>10) or num > max_stock ):
-            if(num<0 or num>10): # 개수 조절 범위 : 0~10
-                num = int(input("개수 조절 허용 범위는 0~10입니다.다시 입력해주세요 : "))
-            elif(num > max_stock): # 재고 수량보다 넘겼을 경우
-                num = int(input("재고({})보다 많은 수량을 주문할 수 없습니다. 다시 입력해주세요: ".format(max_stock)))
-        return num
+class Menu:
+    def __init__(self):
+        self.menu=[]
+
+    def today_menu(self,picked,meal_time): #오늘(지금) 구매 가능한 메뉴 리스트 정보 담는 함수 따로 분기
+        for time in picked:    
+            if(meal_time in time or "간식" in time):
+                meal = picked[time] # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고, meal[3] = 카테고리
+                meal.append(time)
+                self.menu.append(meal)
+        return self.menu
+
+    # qrcode 생성과 동시에 db접근하여 재고 수량 업데이트
+    def stock_update(self,orders):
+        for order in orders:
+            temp = order[0]
+            temp[2] -= order[1]
+            globalDB.update_one({"date":date_token[0]}, {"$set":{temp[3]:temp}},  upsert=True)
 
 class Tmp_cart:
     def __init__(self):
@@ -331,43 +282,80 @@ class Tmp_cart:
     def get_tmp_cart(self):
         return self.tmp_cart
 
-class Controller:
-    def UC4_controller(self):
-        interface = PM_Interface()
-        meal_time=interface.UC4_interface()
-
-        button = Button_click()
-        button.available_now(meal_time)
+class Order: # 얘는 uc4의 메뉴리스트 아니고, uc2의 주문(메뉴리스트+담은수량)
+    def __init__(self):
+        self.order=[]
     
-    def UC2_controller(self,tmp_cart):
-        order = Order()
-        
-        # 주문목록(장바구니에 담긴 메뉴, 수량) 담기
-        for meal in tmp_cart:
-            order.append_order([meal,1])
+    def append_order(self,order_list):
+        self.order.append(order_list)
 
-        while(1):
-            interface=PM_Interface()
-            c = interface.UC2_interface(tmp_cart,order.get_order())
-            
-            button = Button_click()
-            button.control_menu_num(c,order)
+    def control_menu_num(self,order_idx,control_num): # 개수 조절
+        self.order[order_idx][1]=control_num
     
-    def UC5_controller(self,orders):
-        calculator = Calculator(orders)
-        costs,total = calculator.calculate_amount()
-        discount = calculator.calculate_discount()
-        pay=calculator.calculate_pay(discount)
+    def get_order(self):
+        return self.order
 
-        interface=PM_Interface()
-        interface.UC5_interface(costs,total,discount,pay,orders)
+class Data_filter:
+    def filtering(self,num,order,ret):
+        max_stock = order.get_order()[ret-1][0][2]
+        while((num<0 or num>10) or num > max_stock ):
+            if(num<0 or num>10): # 개수 조절 범위 : 0~10
+                num = int(input("개수 조절 허용 범위는 0~10입니다.다시 입력해주세요 : "))
+            elif(num > max_stock): # 재고 수량보다 넘겼을 경우
+                num = int(input("재고({})보다 많은 수량을 주문할 수 없습니다. 다시 입력해주세요: ".format(max_stock)))
+        return num
 
-        button = Button_click()
-        button.payment_process(orders)
+class Calculator:
+    def __init__(self,orders):
+        self.total=0
+        self.costs=[]
+        self.orders=orders
+    
+    def calculate_amount(self):
+        for order in self.orders:
+            cost=int(order[0][1][0]+order[0][1][2:-1])
+            self.costs.append(cost)
+            self.total+=cost*order[1]
+        return self.costs,self.total
 
+    def calculate_discount(self):
+        return self.total//10
+
+    def calculate_pay(self,discount):
+        return self.total-discount
+
+class QRcode:
+    def create_qrcode(self,orders):
+        global restaurant
+        # 현재 시간 가져오기
+        current = datetime.now()
+        # 10분 후 시간 가져오기
+        ten_minutes_later = current + timedelta(minutes=10)
+        ten_minutes_later = ten_minutes_later.strftime('%H시 %M분')
+        
+        print("\n            [. . . . . . loading . . . . . .]\n")
+        time.sleep(1)
+        QR=qrcode.make(orders) # 주문 내역에 대한 정보 qr코드에 저장
+
+        print("======================================================================")
+        print("                      QR이 정상적으로 생성되었습니다.")
+        print("{}까지 {} 학식당에 가서 큐알코드를 보여주세요 (유효시간:10분)".format(ten_minutes_later,restaurant)) # 아직 학식당 안불러옴 나중에 디비에서 빼장
+        print("======================================================================\n")
+        
+        num=int(input("QR이미지를 저장하시겠습니까? (1) yes (2) no : "))
+
+        if num==1:
+            QR.save(("qr_image.png"))
+
+        print("\n주문이 성공적으로 접수되었습니다!!")
+        print("첫 화면으로 돌아갑니다.")
+        time.sleep(2)
+
+        cls()
+        controller = Controller()
+        controller.UC4_controller()
 
         
-
 if __name__ == "__main__":
     controller = Controller()
     controller.UC4_controller()
