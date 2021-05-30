@@ -278,10 +278,9 @@ class Button_click:
             pass
         else:
             num = int(input("원하는 만큼 개수 조절을 해주세요 : "))
-            # while((num<0 or num>10) or num > meal[2] ):
 
             data_filter=Data_filter()
-            data_filter.filtering(num)
+            data_filter.filtering(num,order,ret)
             
             order.control_menu_num(ret-1,num)
             # -> 특정 메뉴 클릭, 개수 입력 / 단 0,10 사이로만 가능함
@@ -300,12 +299,13 @@ class Button_click:
             qr.create_qrcode(orders)
 
 class Data_filter:
-    def filtering(self,num):
-        while((num<0 or num>10)):
+    def filtering(self,num,order,ret):
+        max_stock = order.get_order()[ret-1][0][2]
+        while((num<0 or num>10) or num > max_stock ):
             if(num<0 or num>10): # 개수 조절 범위 : 0~10
                 num = int(input("개수 조절 허용 범위는 0~10입니다.다시 입력해주세요 : "))
-            # elif(num > meal[2]): # 재고 수량보다 넘겼을 경우
-            #     num = int(input("재고({})보다 많은 수량을 주문할 수 없습니다. 다시 입력해주세요: ".format(meal[2])))
+            elif(num > max_stock): # 재고 수량보다 넘겼을 경우
+                num = int(input("재고({})보다 많은 수량을 주문할 수 없습니다. 다시 입력해주세요: ".format(max_stock)))
         return num
 
 class Tmp_cart:
