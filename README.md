@@ -112,37 +112,34 @@
 
 >   | 클래스명(함수명) |  SSD 내 컨셉(클래스)이름  |
 >   | --- | ---  |
->   |**a** |ssd|
->   |**b** |ssd|
->   |**c** |ssd|
->   |**d** |ssd|
->   |**e** |ssd|
->   |**f** |ssd|
->   |**g** |ssd|
+>   |**Controller 클래스 내 UC4_controller()** |컨트롤러|
+>   |**Button_Click 클래스 내 available_num()&putMenu()** |버튼객체|
+>   |**Tmp_cart 클래스**|장바구니Storage|
+>   |**Menu 클래스** |메뉴DB|
+>   |**PM_Interface 클래스 내 UC4_interface()** |페이지생성&인터페이스페이지(팝업생성&팝업-예외)|
 
 - UC2 ( 개수 조절 )
 
 >   | 클래스명(함수명) |  SSD 내 컨셉(클래스)이름  |
 >   | --- | ---  |
->   |**a** |ssd|
->   |**b** |ssd|
->   |**c** |ssd|
->   |**d** |ssd|
->   |**e** |ssd|
->   |**f** |ssd|
->   |**g** |ssd|
+>   |**Controller 클래스 내 UC2_controller()**|컨트롤러|
+>   |**Button_Click 클래스 내 control_menu_num()**|버튼객체|
+>   |**Tmp_cart 클래스**|장바구니Storage|
+>   |**Order 클래스**|주문DB|
+>   |**PM_Interface 클래스 내 UC2_interface()** |페이지생성&인터페이스페이지(팝업생성&팝업-예외)|
+>   |**Data_filter 클래스** |데이터여과|
+>   |**Menu 클래스** |메뉴DB|
 
 - UC5 ( 결제 )
 
 >   | 클래스명(함수명) |  SSD 내 컨셉(클래스)이름  |
 >   | --- | ---  |
->   |**a** |ssd|
->   |**b** |ssd|
->   |**c** |ssd|
->   |**d** |ssd|
->   |**e** |ssd|
->   |**f** |ssd|
->   |**g** |ssd|
+>   |**Controller 클래스 내 UC5_controller()**  |컨트롤러|
+>   |**Button_Click 클래스 내 payment_process()** |버튼객체|
+>   |**Order 클래스** |주문DB|
+>   |**Calculator 클래스** |결제 금액 계산 처리기&회원DB연결|
+>   |**QRcode 클래스** |QR코드처리기|
+>   |**PM_Interface 클래스 내 UC5_interface()**|페이지생성&인터페이스페이지(팝업생성&팝업-예외)|
   
 <br/>
 
