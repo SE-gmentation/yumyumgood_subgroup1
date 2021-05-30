@@ -11,11 +11,14 @@ from dotenv import load_dotenv
 date_token=[]
 load_dotenv(verbose=True)
 client = MongoClient(os.getenv('MONGO_URL'))
+restaurant =""
 
 db = client.meal
 globalDB = db.cham
 
+
 def create_qrcode(orders):
+    global restaurant
     # 현재 시간 가져오기
     current = datetime.now()
     # 10분 후 시간 가져오기
@@ -28,11 +31,9 @@ def create_qrcode(orders):
 
     print("======================================================================")
     print("                      QR이 정상적으로 생성되었습니다.")
-    print("{}까지 {}학식당에 가서 큐알코드를 보여주세요 (유효시간:10분)".format(ten_minutes_later,"은서>_<")) # 아직 학식당 안불러옴 나중에 디비에서 빼장
+    print("{}까지 {} 학식당에 가서 큐알코드를 보여주세요 (유효시간:10분)".format(ten_minutes_later,restaurant)) # 아직 학식당 안불러옴 나중에 디비에서 빼장
     print("======================================================================\n")
     
-    # stock_update() # 디비 재고 업데이트 하는 부분! 
-
     num=int(input("QR이미지를 저장하시겠습니까? (1) yes (2) no : "))
 
     if num==1:
@@ -43,7 +44,7 @@ def create_qrcode(orders):
     time.sleep(2)
 
     cls()
-    main()
+    UC4_controller()
     
 # qrcode 생성과 동시에 db접근하여 재고 수량 업데이트
 def stock_update(orders):
@@ -97,7 +98,6 @@ def pay_list(orders):
     else:
         stock_update(orders)
         create_qrcode(orders)
-        pass
 
 def cart(tmp_cart):
     
@@ -154,110 +154,72 @@ def cart(tmp_cart):
 def cls():
     os.system('cls' if os.name=='nt' else 'clear' )
 
-def today_menu(picked,meal_time): #오늘(지금) 구매 가능한 메뉴 리스트 정보 담는 함수 따로 분기
-    menu = []
-    for time in picked:    
-        if(meal_time in time or "간식" in time):
-            meal = picked[time] # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고, meal[3] = 카테고리
-            meal.append(time)
-            menu.append(meal)
-    return menu
+class Menu:
+    def today_menu(self,picked,meal_time): #오늘(지금) 구매 가능한 메뉴 리스트 정보 담는 함수 따로 분기
+        menu = []
+        for time in picked:    
+            if(meal_time in time or "간식" in time):
+                meal = picked[time] # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고, meal[3] = 카테고리
+                meal.append(time)
+                menu.append(meal)
+        return menu
 
-# 메뉴 디스플레이하고 선택하는 함수
-def lookup(menu):
-    tmp_cart=[] # 장바구니 화면에서 이어서 보여져야할 구매목록들
-    while(1):
-        cls()
-        print("=========[메뉴 선택]========")
-        c = 0
-        for idx, meal in enumerate(menu):
-            c = idx
-            print("({}). {} / 재고 : {}".format(idx+1, meal[1], meal[2])) # 가격 표시
-            print(meal[0]) # 메뉴 표시
-            print("\n")
+class UC4_Interface:
+    def __init__(self):
+        pass
 
-        print("({}). 뒤로 가기".format(c+2))
-        print("\n")
+    def interface(self):
+        global date_token
+        global restaurant
+        global globalDB
+        now = datetime.now()
+        # dt_string = now.strftime("%m/%d %H:%M")
+        dt_string = "05/28 12:30"
+        date_token = dt_string.split(" ")
+        meal_time = ""
 
-        print("({}). 장바구니 보러가기 ".format(c+3))
-        print("\n")
+        hour = int(date_token[1].split(":")[0])
 
-        print("담긴 개수 | ",len(tmp_cart))
-
-        ret = int(input("원하는 메뉴들을 담아주세요 : "))
-        while(ret<=0 or ret>c+3):
-            ret = int(input("다시 입력해주세요 : "))
-
-        if(ret == c+2): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
-            print("이전 화면으로 돌아갑니다.")
-            cls()
-            return 0 
-
-        elif(ret == c+3): # 장바구니 보러가기 기능
-            if len(tmp_cart)==0:
-                print("메뉴를 1개 이상 담아주세요.")
-                time.sleep(0.5)
-            else:
-                cart(tmp_cart)
+        if( 11<= hour and hour <= 13):
+            meal_time = "중식"
         else:
-            # 개수조절 또는 담은 메뉴 삭제는 장바구니 화면에서만 할 수 있음
-            # 따라서 if문으로 분기 
-            try:
-                if menu[ret-1] in tmp_cart:
-                    print("이미 담은 메뉴입니다.")
-                    time.sleep(0.5)
-                else:
-                    tmp_cart.append(menu[ret-1])
-                    print("장바구니에 정상적으로 담겼습니다.")
-                    # print("장바구니 목록:",tmp_cart)
-                    time.sleep(0.5)
-            except IndexError:
-                tmp_cart.append(menu[ret-1])
-                print("장바구니에 정상적으로 담겼습니다.")
-                time.sleep(0.5)
-                # print("장바구니 목록:",tmp_cart)
+            meal_time = "석식"
 
+        print("! 환영합니다 !")
+        print("접속 시각 : {}, {}".format(date_token[0], date_token[1]))
 
+        print("지금은 {} 조회가 가능해요.\n".format(meal_time))
+        print("1. 참슬기 식당(310관 B4층)")
+        print("2. 블루미르홀 308관")
+        print("3. 종료하기\n")
 
-# main
-def main():
-    global date_token
-    global globalDB
-    while(1):
+        return meal_time
+
+class UC4_button_click:
+    def available_now(self,meal_time):
+        global date_token
+        global restaurant
+        global globalDB
         try:
-            now = datetime.now()
-            # dt_string = now.strftime("%m/%d %H:%M")
-            dt_string = "05/28 12:30"
-            date_token = dt_string.split(" ")
-            meal_time = ""
-
-            hour = int(date_token[1].split(":")[0])
-
-            if( 11<= hour and hour <= 13):
-                meal_time = "중식"
-            else:
-                meal_time = "석식"
-
-            print("! 환영합니다 !")
-            print("접속 시각 : {}, {}".format(date_token[0], date_token[1]))
-
-            print("지금은 {} 조회가 가능해요.\n".format(meal_time))
-            print("1. 참슬기 식당(310관 B4층)")
-            print("2. 블루미르홀 308관")
-            print("3. 종료하기\n")
+            
             res = input("조회를 원하는 식당이나 옵션을 선택해주세요. : ")
 
             if(res =="1" or res == "2"):
                 if(res =="1"):
+                    restaurant="참슬기"
                     picked = list(globalDB.find({"date":date_token[0]}))
                     picked = picked[0]
                 elif(res == "2"):
+                    restaurant="블루미르홀"
                     globalDB = db.blue
                     picked = list(globalDB.find({"date":date_token[0]}))
                     picked = picked[0]
 
-                menu=today_menu(picked,meal_time)
-                lookup(menu)
+                menu=Menu()
+                menu_list=menu.today_menu(picked,meal_time)
+
+                self.putMenu(menu_list)
+
             elif(res == "3"):
                 print("\n프로그램을 종료합니다 ! 빠이빠이")
                 sys.exit()
@@ -266,5 +228,80 @@ def main():
             print("\n프로그램을 종료합니다 ! 빠이빠이")
             sys.exit()
 
+    # 메뉴 디스플레이하고 선택하는 함수
+    def putMenu(self,menu):
+        tmp_cart=Tmp_cart()
+        while(1):
+            cls()
+            print("=========[메뉴 선택]========")
+            c = 0
+            for idx, meal in enumerate(menu):
+                c = idx
+                print("({}). {} / 재고 : {}".format(idx+1, meal[1], meal[2])) # 가격 표시
+                print(meal[0]) # 메뉴 표시
+                print("\n")
+
+            print("({}). 뒤로 가기".format(c+2))
+            print("\n")
+
+            print("({}). 장바구니 보러가기 ".format(c+3))
+            print("\n")
+
+            print("담긴 개수 | ",len(tmp_cart.get_tmp_cart()))
+
+            ret = int(input("원하는 메뉴들을 담아주세요 : "))
+            while(ret<=0 or ret>c+3):
+                ret = int(input("다시 입력해주세요 : "))
+
+            if(ret == c+2): # 뒤로 가기 (어떤 메뉴도 클릭하지 않았다.)
+                print("이전 화면으로 돌아갑니다.")
+                cls()
+                return 0 
+
+            elif(ret == c+3): # 장바구니 보러가기 기능
+                if len(tmp_cart.get_tmp_cart())==0:
+                    print("메뉴를 1개 이상 담아주세요.")
+                    time.sleep(0.5)
+                else:
+                    cart(tmp_cart.get_tmp_cart())
+            else:
+                tmp_cart.compute_total_num(menu[ret-1])
+
+class Tmp_cart:
+    def __init__(self):
+        self.tmp_cart=[]
+
+    def compute_total_num(self,menu):
+        try:
+            if menu in self.tmp_cart:
+                print("이미 담은 메뉴입니다.")
+                time.sleep(0.5)
+            else:
+                self.append_tmp_cart(menu)
+        except IndexError:
+            self.append_tmp_cart(menu)
+
+    def append_tmp_cart(self,menu):
+        self.tmp_cart.append(menu)
+        print("장바구니에 정상적으로 담겼습니다.")
+        time.sleep(0.5)
+        # print("장바구니 목록:",tmp_cart)
+
+    def get_tmp_cart(self):
+        return self.tmp_cart
+
+def UC4_controller():
+    interface = UC4_Interface()
+    meal_time=interface.interface()
+
+    button = UC4_button_click()
+    button.available_now(meal_time)
+        
+
 if __name__ == "__main__":
-    main()
+    UC4_controller()
+
+
+
+    # UC2_controller()
+    # UC5_controller()
