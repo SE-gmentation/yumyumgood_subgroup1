@@ -1,4 +1,7 @@
 
+# Link
+https://github.com/SE-gmentation/yumyumgood_subgroup1
+<br/>
 ## 📢 SubGroup 1
 
 - 주제 소개
