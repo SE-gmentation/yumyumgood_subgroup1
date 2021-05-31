@@ -30,7 +30,7 @@ https://github.com/SE-gmentation/yumyumgood_subgroup1
 1. Clone this repository
 
    ```bash
-   $ git clone https://github.com/SE-gmentation/yumyumgood.git
+   $ git clone https://github.com/SE-gmentation/yumyumgood_subgroup1.git
    ```
 
 2. Install 
