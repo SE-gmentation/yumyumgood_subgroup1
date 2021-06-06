@@ -20,7 +20,7 @@ globalDB = db.cham
 def cls():
     os.system('cls' if os.name=='nt' else 'clear' )
 
-class Controller:
+class Controller: # 컨트롤러
     def UC4_controller(self):
         interface = PM_Interface()
         meal_time=interface.UC4_interface()
@@ -54,7 +54,7 @@ class Controller:
         button = Button_click()
         button.payment_process(orders)
 
-class PM_Interface:
+class PM_Interface: # UC별 페이지생성/인터페이스/예외페이지
     def UC2_interface(self,tmp_cart,order):
         cls()
         print("=========[장바구니]=========")
@@ -127,7 +127,7 @@ class PM_Interface:
         print("\n")
         print("({}). 결제 하러 가기 (QR코드) \n".format(2))
 
-class Button_click:
+class Button_click: # 버튼 클릭
     def available_now(self,meal_time):
         global date_token
         global restaurant
@@ -161,7 +161,6 @@ class Button_click:
             sys.exit()
         cls()
 
-    # 메뉴 디스플레이하고 선택하는 함수
     def putMenu(self,menu):
         tmp_cart=Tmp_cart()
         while(1):
@@ -240,11 +239,11 @@ class Button_click:
             qr = QRcode()
             qr.create_qrcode(orders)
 
-class Menu:
+class Menu: # 메뉴 DB
     def __init__(self):
         self.menu=[]
-
-    def today_menu(self,picked,meal_time): #오늘(지금) 구매 가능한 메뉴 리스트 정보 담는 함수 따로 분기
+    # 현 시간대에 주문 가능한 메뉴리스트 추출
+    def today_menu(self,picked,meal_time): 
         for time in picked:    
             if(meal_time in time or "간식" in time):
                 meal = picked[time] # meal[0] = 메뉴 이름, meal[1] = 가격, meal[2] = 재고, meal[3] = 카테고리
@@ -262,7 +261,7 @@ class Menu:
 class Tmp_cart:
     def __init__(self):
         self.tmp_cart=[]
-
+    # 총 장바구니 담은 개수 
     def compute_total_num(self,menu):
         try:
             if menu in self.tmp_cart:
@@ -272,7 +271,7 @@ class Tmp_cart:
                 self.append_tmp_cart(menu)
         except IndexError:
             self.append_tmp_cart(menu)
-
+    # 장바구니 목록
     def append_tmp_cart(self,menu):
         self.tmp_cart.append(menu)
         print("장바구니에 정상적으로 담겼습니다.")
@@ -282,7 +281,7 @@ class Tmp_cart:
     def get_tmp_cart(self):
         return self.tmp_cart
 
-class Order: # 얘는 uc4의 메뉴리스트 아니고, uc2의 주문(메뉴리스트+담은수량)
+class Order: # 주문 DB
     def __init__(self):
         self.order=[]
     
@@ -295,7 +294,7 @@ class Order: # 얘는 uc4의 메뉴리스트 아니고, uc2의 주문(메뉴리�
     def get_order(self):
         return self.order
 
-class Data_filter:
+class Data_filter: # 데이터 여과기
     def filtering(self,num,order,ret):
         max_stock = order.get_order()[ret-1][0][2]
         while((num<0 or num>10) or num > max_stock ):
@@ -305,7 +304,7 @@ class Data_filter:
                 num = int(input("재고({})보다 많은 수량을 주문할 수 없습니다. 다시 입력해주세요: ".format(max_stock)))
         return num
 
-class Calculator:
+class Calculator: # 결제 금액 처리기
     def __init__(self,orders):
         self.total=0
         self.costs=[]
@@ -324,7 +323,7 @@ class Calculator:
     def calculate_pay(self,discount):
         return self.total-discount
 
-class QRcode:
+class QRcode: # QR 생성
     def create_qrcode(self,orders):
         global restaurant
         # 현재 시간 가져오기
